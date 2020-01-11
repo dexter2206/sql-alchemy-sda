@@ -38,12 +38,11 @@ if __name__ == "__main__":
     for user_name in session.query(User.name.label("user_name")):
         print(user_name)
 
+    print("Aliased: ")
+    aliased_user = aliased(User, name="user_alias")
     # Aliasing entities
-    for row in session.query(aliased(User, name="user_alias"), User.nickname):
+    for row in session.query(aliased_user, aliased_user.nickname):
         print(row.user_alias, row.nickname)
 
-    # Query only specific fields - alternative version
-    for fullname, nickname in session.query(User.fullname, User.nickname):
-        print(fullname, nickname)
 
     session.close()
