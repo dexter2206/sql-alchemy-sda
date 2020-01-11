@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, create_engine, and_, or_
+from sqlalchemy import Column, Integer, String, create_engine, and_, or_, DateTime
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
@@ -12,9 +14,12 @@ class User(Base):
     name = Column(String)
     fullname = Column(String)
     nickname = Column(String)
+    birth_date = Column(DateTime)
 
     def __repr__(self):
-        return f"<User(name='{self.name}', fullname='{self.fullname}', nickname='{self.nickname}')"
+        return (
+            f"<User(name='{self.name}', fullname='{self.fullname}', "
+            f"nickname='{self.nickname}, birth_date='{self.birth_date}')")
 
 
 if __name__ == "__main__":
@@ -25,11 +30,16 @@ if __name__ == "__main__":
 
     session = Session()
     session.add_all([
-        User(name="Ed", fullname="Ed Jones", nickname="Scissorhands"),
-        User(name="Wendy", fullname="Wendy Jones", nickname="windy"),
-        User(name='Mary', fullname="Mary Contrary", nickname="nmary"),
-        User(name="Fred", fullname="Fred Flintstone", nickname="freddy"),
-        User(name="Ed", fullname="Ed Doe", nickname="Eddie")
+        User(name="Ed", fullname="Ed Jones", nickname="Scissorhands",
+             birth_date=datetime(1988, 6, 6)),
+        User(name="Wendy", fullname="Wendy Jones", nickname="windy",
+             birth_date=datetime(2000, 7, 15)),
+        User(name='Mary', fullname="Mary Contrary", nickname="nmary",
+             birth_date=datetime(2001, 4, 15)),
+        User(name="Fred", fullname="Fred Flintstone", nickname="freddy",
+             birth_date=datetime(2005, 3, 2)),
+        User(name="Ed", fullname="Ed Doe", nickname="Eddie",
+             birth_date=datetime(2005, 3, 2))
     ]
     )
 
@@ -40,7 +50,7 @@ if __name__ == "__main__":
         print(user)
 
     print("Using ilike: ")
-    for user in session.query(User).filter(User.fullname.like("%ed")):
+    for user in session.query(User).filter(User.fullname.ilike("%ed%")):
         print(user)
 
     print("Using and_")
@@ -54,6 +64,10 @@ if __name__ == "__main__":
     # Using in
     print("Using in_")
     for user in session.query(User).filter(User.name.in_(["Mary", "Wendy"])):
+        print(user)
+
+    print("People born before 2000:")
+    for user in session.query(User).filter(User.birth_date < datetime(2001, 1, 1)):
         print(user)
 
     session.close()
