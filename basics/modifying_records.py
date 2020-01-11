@@ -18,7 +18,7 @@ class User(Base):
 
 
 if __name__ == "__main__":
-    engine = create_engine("sqlite:///:memory:", echo=True)
+    engine = create_engine("sqlite:///:memory:", echo=False)
     Base.metadata.create_all(engine)
 
     Session = sessionmaker(bind=engine)
@@ -30,12 +30,15 @@ if __name__ == "__main__":
     session = Session()
 
     session.add(ed_user)
+    session.commit()
 
     ed_user.nickname = "Eddie"
     print("Are there any modified records?")
     print(session.dirty)
 
     session.commit()
+
+    print("How about now?")
     print(session.dirty)
 
     print(session.query(User).first())
